@@ -12,6 +12,7 @@ const config = {
     url: process.env.INDEPENDENT_BASE_URL || "https://api.groq.com/openai/v1",
     name: process.env.INDEPENDENT_MODEL || "openai/gpt-oss-120b",
     key: process.env.INDEPENDENT_API_KEY,
+    reasoningEffort: "low",
   },
 };
 

@@ -21,6 +21,7 @@ export async function callModel(model, question, temperature, maxTokens) {
       ],
       temperature,
       max_tokens: maxTokens,
+      reasoning_effort: model.reasoningEffort,
     }),
   });
 
@@ -30,7 +31,7 @@ export async function callModel(model, question, temperature, maxTokens) {
   }
 
   const data = await response.json();
-  return data.choices[0].message.content;
+  return data.choices[0].message.content || "";
 }
 
 // Turns "ANSWER: NO\nREASON: ..." into { verdict: "NO", reason: "..." }.
@@ -61,10 +62,10 @@ export function looksLikeYesNo(question) {
 }
 
 // Asks once. If the reply can't be read, tries one more time.
-async function askOnce(model, question) {
-  let result = parseReply(await callModel(model, question, 0.7, 200));
+async function askOnce(model, question, temperature, maxTokens) {
+  let result = parseReply (await callModel(model, question, temperature, maxTokens));
   if (result.verdict === "UNCLEAR") {
-    result = parseReply(await callModel(model, question, 0.7, 200));
+    result = parseReply (await callModel(model, question, temperature, maxTokens));
   }
   return result;
 }
@@ -74,7 +75,7 @@ export async function checkConsistency(question, times = 5) {
   const model = config.answerModel;
   const calls = [];
   for (let i = 0; i < times; i++) {
-    calls.push(askOnce(model, question));
+    calls.push(askOnce(model, question, 0.7, 200));
   }
   const samples = await Promise.all(calls);
 
@@ -93,9 +94,16 @@ export async function checkConsistency(question, times = 5) {
   };
 }
 
-export async function askAnswerModel(question) {
-  if (!looksLikeYesNo(question)) {
-    return { verdict: "NOT_YES_NO"};
+// Asks a second model once.
+export async function askIndependentModel(question) {
+  const model = config.independentModel;
+  if (!model.key) {
+    return { verdict: "UNAVAILABLE" };
   }
-  return checkConsistency(question);
+  try {
+    return await askOnce(model, question, 0.2, 1000);
+  } catch (err) {
+    console.error(err.message);
+    return { verdict: "UNAVAILABLE" };
+  }
 }
