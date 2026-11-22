@@ -60,11 +60,42 @@ export function looksLikeYesNo(question) {
   return YES_NO_STARTS.includes(firstWord);
 }
 
+// Asks once. If the reply can't be read, tries one more time.
+async function askOnce(model, question) {
+  let result = parseReply(await callModel(model, question, 0.7, 200));
+  if (result.verdict === "UNCLEAR") {
+    result = parseReply(await callModel(model, question, 0.7, 200));
+  }
+  return result;
+}
+
+// Asks the answering model 5 times and measures how much the answers agree.
+export async function checkConsistency(question, times = 5) {
+  const model = config.answerModel;
+  const calls = [];
+  for (let i = 0; i < times; i++) {
+    calls.push(askOnce(model, question));
+  }
+  const samples = await Promise.all(calls);
+
+  const yesCount = samples.filter((s) => s.verdict === "YES").length;
+  const noCount = samples.filter((s) => s.verdict === "NO").length;
+
+  let verdict = "UNCLEAR";
+  if (yesCount > noCount) verdict = "YES";
+  if (noCount > yesCount) verdict = "NO";
+
+  return {
+    verdict,
+    agreeCount: verdict === "UNCLEAR" ? 0 : Math.max(yesCount, noCount),
+    total: times,
+    samples,
+  };
+}
+
 export async function askAnswerModel(question) {
   if (!looksLikeYesNo(question)) {
-    return { verdict: "NOT_YES_NO", reason: "" };
+    return { verdict: "NOT_YES_NO"};
   }
-  const model = config.answerModel;
-  const text = await callModel(model, question, 0.7, 200);
-  return parseReply(text);
+  return checkConsistency(question);
 }
