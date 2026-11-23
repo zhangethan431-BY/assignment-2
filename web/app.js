@@ -6,6 +6,34 @@ const answerCard = document.querySelector("#answer-card");
 const answerText = document.querySelector("#answer-text");
 const reliabilityCard = document.querySelector("#reliability-card");
 const reliabilityText = document.querySelector("#reliability-text");
+const reliabilityBar = document.querySelector("#reliability-bar");
+const viewToggle = document.querySelector("#view-toggle");
+
+const FILLED_SEGMENTS = { LOW: 1, MEDIUM: 2, HIGH: 3 };
+let lastReliability = null;
+
+function showReliability() {
+  if (!lastReliability) return;
+  const level = lastReliability.level;
+  const view = document.querySelector('input[name="view"]:checked').value;
+
+  if (view === "words") {
+    reliabilityText.textContent = `${level}: ${lastReliability.reason}`;
+    reliabilityText.hidden = false;
+    reliabilityBar.hidden = true;
+  } else {
+    const segments = reliabilityBar.querySelectorAll("span");
+    for (let i = 0; i < segments.length; i++) {
+      segments[i].classList.toggle("filled", i < FILLED_SEGMENTS[level]);
+    }
+    reliabilityBar.dataset.level = level;
+    reliabilityBar.setAttribute("aria-label", `Reliability: ${level}`);
+    reliabilityText.hidden = true;
+    reliabilityBar.hidden = false;
+  }
+}
+
+viewToggle.addEventListener("change", showReliability);
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -33,7 +61,8 @@ form.addEventListener("submit", async (event) => {
 
     message.textContent = "";
     answerText.textContent = data.answer.verdict;
-    reliabilityText.textContent = `${data.reliability.level}: ${data.reliability.reason}`;
+    lastReliability = data.reliability;
+    showReliability();
     answerCard.hidden = false;
     reliabilityCard.hidden = false;
   } catch (err) {

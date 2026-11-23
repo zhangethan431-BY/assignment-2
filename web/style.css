@@ -1,0 +1,19 @@
+.bar span {
+  display: inline-block;
+  width: 48px;
+  height: 14px;
+  margin-right: 4px;
+  background: #e0e0e0;
+}
+
+.bar[data-level="LOW"] .filled {
+  background: #c62828;
+}
+
+.bar[data-level="MEDIUM"] .filled {
+  background: #f9a825;
+}
+
+.bar[data-level="HIGH"] .filled {
+  background: #2e7d32;
+}

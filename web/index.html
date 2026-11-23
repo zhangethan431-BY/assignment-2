@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Second Look</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <main>
@@ -24,7 +25,14 @@
 
     <section id="reliability-card" hidden>
       <h2>Reliability check</h2>
+      <div id="view-toggle">
+        <label><input type="radio" name="view" value="words" checked> Words</label>
+        <label><input type="radio" name="view" value="bar"> Bar</label>
+      </div>
       <p id="reliability-text"></p>
+      <div id="reliability-bar" class="bar" hidden>
+        <span></span><span></span><span></span>
+      </div>
     </section>
   </main>
 
