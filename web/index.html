@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Second Look</title>
+</head>
+<body>
+  <main>
+    <h1>Second Look</h1>
+    <p>Ask a yes/no question.</p>
+
+    <form id="question-form">
+      <input id="question" type="text" maxlength="300" placeholder="e.g. Is 3599 a prime number?" required>
+      <button id="ask-button" type="submit">Ask</button>
+    </form>
+
+    <p id="message"></p>
+
+    <section id="answer-card" hidden>
+      <h2>Answer</h2>
+      <p id="answer-text"></p>
+    </section>
+
+    <section id="reliability-card" hidden>
+      <h2>Reliability check</h2>
+      <p id="reliability-text"></p>
+    </section>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

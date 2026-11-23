@@ -5,6 +5,7 @@ import { combine } from "./reliability.js";
 
 const app = express();
 app.use(express.json());
+app.use(express.static("web"));
 
 // Receives a question, asks both models and returns the answer with its reliability level.
 app.post("/api/answer", async (req, res) => {
