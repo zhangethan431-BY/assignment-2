@@ -33,7 +33,28 @@
       <div id="reliability-bar" class="bar" hidden>
         <span></span><span></span><span></span>
       </div>
+      <details id="reasons-panel">
+        <summary id="reasons-summary">Show reasons</summary>
+        <h3>Answering model (5 answers)</h3>
+        <ol id="answer-reasons"></ol>
+        <h3>Independent model</h3>
+        <p id="independent-reason"></p>
+      </details>
     </section>
+    <form id="decision-form" hidden>
+      <h2>Your decision</h2>
+      <p>Would you rely on this answer?</p>
+      <label><input type="radio" name="decision" value="rely" required> Rely on it</label>
+      <label><input type="radio" name="decision" value="not-rely"> Don't rely on it</label>
+      <p>How much do you trust this answer? (1 = not at all, 5 = completely)</p>
+      <label><input type="radio" name="trust" value="1" required> 1</label>
+      <label><input type="radio" name="trust" value="2"> 2</label>
+      <label><input type="radio" name="trust" value="3"> 3</label>
+      <label><input type="radio" name="trust" value="4"> 4</label>
+      <label><input type="radio" name="trust" value="5"> 5</label>
+      <p><button id="save-button" type="submit">Save decision</button></p>
+      <p id="decision-message"></p>
+    </form>
   </main>
 
   <script type="module" src="app.js"></script>

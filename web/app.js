@@ -8,9 +8,19 @@ const reliabilityCard = document.querySelector("#reliability-card");
 const reliabilityText = document.querySelector("#reliability-text");
 const reliabilityBar = document.querySelector("#reliability-bar");
 const viewToggle = document.querySelector("#view-toggle");
+const reasonsPanel = document.querySelector("#reasons-panel");
+const reasonsSummary = document.querySelector("#reasons-summary");
+const answerReasons = document.querySelector("#answer-reasons");
+const independentReason = document.querySelector("#independent-reason");
+const decisionForm = document.querySelector("#decision-form");
+const saveButton = document.querySelector("#save-button");
+const decisionMessage = document.querySelector("#decision-message");
 
 const FILLED_SEGMENTS = { LOW: 1, MEDIUM: 2, HIGH: 3 };
 let lastReliability = null;
+let lastQuestion = "";
+let lastAnswer = "";
+let reasonsOpened = false;
 
 function showReliability() {
   if (!lastReliability) return;
@@ -35,10 +45,56 @@ function showReliability() {
 
 viewToggle.addEventListener("change", showReliability);
 
+function showReasons(answer, independent) {
+  answerReasons.textContent = "";
+  for (const sample of answer.samples) {
+    const item = document.createElement("li");
+    item.textContent = `${sample.verdict}: ${sample.reason || "(no reason given)"}`;
+    answerReasons.append(item);
+  }
+
+  if (independent.verdict === "UNAVAILABLE") {
+    independentReason.textContent = "The independent model was unavailable.";
+  } else {
+    independentReason.textContent = `${independent.verdict}: ${independent.reason || "(no reason given)"}`;
+  }
+}
+
+reasonsPanel.addEventListener("toggle", () => {
+  if (reasonsPanel.open) reasonsOpened = true;
+});
+
+decisionForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const record = {
+    question: lastQuestion,
+    answer: lastAnswer,
+    reliability: lastReliability.level,
+    view: document.querySelector('input[name="view"]:checked').value,
+    reasonsOpened,
+    decision: document.querySelector('input[name="decision"]:checked').value,
+    trust: Number(document.querySelector('input[name="trust"]:checked').value),
+  };
+
+  try {
+    const response = await fetch("/api/decision", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(record),
+    });
+    if (!response.ok) throw new Error("Save failed");
+    decisionMessage.textContent = "Saved. You can ask another question.";
+    saveButton.disabled = true;
+  } catch (err) {
+    decisionMessage.textContent = "Could not save your decision.";
+  }
+});
+
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
   answerCard.hidden = true;
   reliabilityCard.hidden = true;
+  decisionForm.hidden = true;
   message.textContent = "Asking both models...";
   askButton.disabled = true;
 
@@ -60,11 +116,23 @@ form.addEventListener("submit", async (event) => {
     }
 
     message.textContent = "";
-    answerText.textContent = data.answer.verdict;
+    lastQuestion = input.value.trim();
+    lastAnswer = data.answer.verdict;
+    answerText.textContent = lastAnswer === "UNCLEAR" ? "No clear answer" : lastAnswer;
     lastReliability = data.reliability;
     showReliability();
+    showReasons(data.answer, data.independent);
+    reasonsPanel.open = false;
+    reasonsSummary.textContent = data.reliability.level === "LOW"
+      ? "Check the reasons before relying on this answer"
+      : "Show reasons";
+    reasonsOpened = false;
+    decisionForm.reset();
+    decisionMessage.textContent = "";
+    saveButton.disabled = false;
     answerCard.hidden = false;
     reliabilityCard.hidden = false;
+    decisionForm.hidden = false;
   } catch (err) {
     message.textContent = "Could not reach the server. Is it running?";
   } finally {

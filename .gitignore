@@ -157,3 +157,5 @@ vite.config.ts.timestamp-*
 .nx/migrate-runs
 
 .DS_Store
+
+decisions.jsonl

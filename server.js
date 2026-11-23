@@ -1,4 +1,5 @@
 import express from "express";
+import { appendFile } from "node:fs/promises";
 import config from "./config.js";
 import { looksLikeYesNo, checkConsistency, askIndependentModel } from "./llm.js";
 import { combine } from "./reliability.js";
@@ -31,6 +32,22 @@ app.post("/api/answer", async (req, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(502).json({ error: err.message });
+  }
+});
+
+// Saves one decision as a line in decisions.jsonl.
+app.post("/api/decision", async (req, res) => {
+  const { decision, trust } = req.body;
+  if (!["rely", "not-rely"].includes(decision) || ![1, 2, 3, 4, 5].includes(trust)) {
+    return res.status(400).json({ error: "Invalid decision or trust rating." });
+  }
+  const record = { ...req.body, time: new Date().toISOString() };
+  try {
+    await appendFile("decisions.jsonl", JSON.stringify(record) + "\n");
+    res.json({ saved: true });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: "Could not save the decision." });
   }
 });
 
