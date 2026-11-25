@@ -3,7 +3,7 @@ A prototype that answers a yes/no question with a small AI model, cross-checks i
 
 **Prose word count:** 1003 (code and commands are not counted)
 
-**Submitted version:** release `v1.0-submission`
+**Submitted version:** release `v2.0-submission`
 
 ## Project status
 
@@ -83,9 +83,9 @@ In each of the six questions with a wrong answer, all five replies from the answ
 
 ## AI assistance
 
-While building the web system, there were some parts of the code that I wasn’t proficient in writing. I sought help and learned the coding methods from the AI. I studied these parts of code that I couldn’t handle, tested them thoroughly to make sure it worked correctly, and checked that it met the system requirements.
+While building the web system, there were some parts of the code that I wasn’t proficient in writing. I sought help and learned the coding methods from ChatGPT. I studied these parts of code that I couldn’t handle, tested them thoroughly to make sure it worked correctly, and checked that it met the system requirements.
 
-For the system diagram, I specified the layout, the content of each section, and how the different components should be connected. AI generated the initial version based on my instructions. I then reviewed the diagram and made further adjustments myself to ensure it accurately represented my system.
+For the system diagram, I specified the layout, the content of each section, and how the different components should be connected. ChatGPT generated the initial version based on my instructions. I then reviewed the diagram and made further adjustments myself to ensure it accurately represented my system.
 
 ## Additional files
 
